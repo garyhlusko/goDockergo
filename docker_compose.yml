@@ -29,7 +29,7 @@ services:
     ports:
       - "80:${WEB_PORT}"
     volumes:
-      - ./usermanagement/static:/srv/static
+      - ./site_name/static:/srv/static
       - ./nginx:/etc/nginx/conf.d
       #replace site_name with your site.conf
       - ./nginx/site_name.conf:/etc/nginx/sites-enabled
