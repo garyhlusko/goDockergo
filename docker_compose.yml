@@ -1,0 +1,46 @@
+version: '3'
+
+services:
+  db:
+    image: postgres
+    environment:
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_DB=${DB_NAME}
+    ports:
+      - "5434:${DB_PORT}"
+    volumes:
+      - postgresql-data:/var/lib/postgresql/data
+    restart: always
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - .:/srv/code
+    ports:
+      - "8001:${APP_PORT}"
+    command: bash -c "uwsgi --ini uwsgi.ini --http :8001"
+    restart: always
+    depends_on:
+      - db
+  server:
+    image: nginx
+    ports:
+      - "80:${WEB_PORT}"
+    volumes:
+      - ./usermanagement/static:/srv/static
+      - ./nginx:/etc/nginx/conf.d
+      #replace site_name with your site.conf
+      - ./nginx/site_name.conf:/etc/nginx/sites-enabled
+    restart: always
+    depends_on:
+      - web
+
+volumes:
+  postgresql-data:
+
+networks:
+  default:
+    external:
+      name: ${network_name}
